@@ -1,0 +1,174 @@
+function [f,v,P,V,D,J,M] = gkfast(x,f0,m,e,s,rho)
+% Gustastafson-Kessel clustering algorithm (with fuzzy covariance matrix).
+%
+% [F,C,P,V,D,J,M] = GKFAST(X,F0,m,e,s,rho)
+%     Input:
+%       X  ... M by N data matrix,
+%              M is the number of data points and N data dimension
+%       F0 ... either an initial fuzzy partition matrix, or the
+%              number of clusters. In the latter case, a default
+%              partition matrix is generated.
+%       m  ... optional parameter m > 1, determines the fuzziness
+%              of clustering, for m close to 1 clusters become crisp,
+%              default value is 2
+%       e  ... optional termination tolerance, the algorithm stops
+%              when max(max(|F(k-1) - F(k)|)) <= e, default tolerance 1e-3
+%       s  ... optional parameter for plotting intermediate results
+%              (only for 2D data), default 0 - i.e. no plot, set
+%              to 1 to show the clustering process on-line,
+%          set to 2 to speed-up the plots for ordered data
+%       rho .. 1xM vector of expected cluster volumes (default a unit vector)
+%
+%     Output:
+%       F  ... fuzzy partition matrix
+%       C  ... cluster means matrix
+%       P  ... cluster covariance matrices concatenated in one matrix
+%              P = [P1;P2;...Pk], where k is number of clusters
+%       V  ... eigenvectors of the covariance matrices, corresponding
+%              to the smallest eigenvalues
+%       D  ... eigenvalues of the covariance matrices
+%       J  ... history of the clustering criterion J
+%       M  ... matrices inducing the distance norm, calculated as
+%              M = det(P).^(1/N)*inv(P), M = [M1;M2;...Mk]
+
+% (c) Robert Babuska, 1994-96
+
+if (nargin < 3), m = 2;    elseif isempty(m),   m = 2; end;
+if (nargin < 4), e = 1e-2; elseif isempty(e),   e = 1e-2; end;
+if (nargin < 5), s = 0;    elseif isempty(s),   s = 0; end;
+
+[mx,nx] = size(x);
+[mf0,nf0] = size(f0);
+x1 = ones(mx,1);
+inx = 1/nx;
+
+% Initialize fuzzy partition matrix
+if max(mf0,nf0) == 1,       % only # of cluster given
+  c = f0;
+  mm = mean(x);
+  aa = max(abs(x - ones(mx,1)*mm));
+  v = 2*(ones(c,1)*aa).*(rand(c,nx)-0.5) + ones(c,1)*mm;
+elseif nf0 == nx,       % centers given
+  c = mf0;
+  v = f0;
+end;
+
+if mf0 ~= mx,
+% Calculate f0
+  for j = 1 : c,                        % for all clusters
+    xv = x - x1*v(j,:);
+    d(:,j) = sum((xv.^2)')';
+  end;
+  d = (d+1e-100).^(-1/(m-1));
+  f0 = (d ./ (sum(d')'*ones(1,c)));
+else
+  c = size(f0,2);
+  fm = f0.^m; sumf = sum(fm);
+  v = (fm'*x)./(sumf'*ones(1,nx));
+end
+
+f = zeros(mx,c);                % partition matrix
+iter = 0;                       % iteration counter
+
+if (nargin < 6), rho = ones(1,c); elseif isempty(rho), rho = ones(1,c); end;
+
+% initialize graphics
+if (s ~= 0)  &  (nx < 3),
+    subplot(211);
+    lines = [v(:,1)*x(:,1)'+v(:,2)*ones(1,mx)]';
+    mask = find(f0 < 0.2);                   % find membership degrees < 0.2
+    lines(mask) = NaN*ones(size(mask));      % mask with NaN's for plots
+    H1 = plot(x(:,1),x(:,2),'go',v(:,1),v(:,2),'r*',x(:,1),lines,'EraseMode','xor');
+    title('Function approximation');
+    xlabel('x'); ylabel('y');
+    minx = min(x(:,1)); maxx = max(x(:,1));
+    miny = min(x(:,2)); maxy = max(x(:,2));
+    ma = 0.3*max(abs(x(:,2)));
+    axis([minx maxx miny-ma maxy+ma]);
+    subplot(212);
+    if s == 1,
+      H2 = plot(x(:,1),f0,'o','EraseMode','xor');
+    else
+      H2 = plot(x(:,1),f0,'EraseMode','xor');
+    end;
+    title('Membership functions');
+    xlabel('x'); ylabel('Membership');
+    set(gcf,'UserData',[H1;H2]);
+end;
+
+% Iterate
+while  max(max(abs(f0-f))) > e
+  iter = iter + 1;
+  f = f0;
+  fm = f.^m; sumf = sum(fm);
+% Calculate centers
+  v = (fm'*x)./(sumf'*ones(1,nx));
+  for j = 1 : c,                        % for all clusters
+    xv = x - x1*v(j,:);
+% Calculate covariance matrix
+    p = ones(nx,1)*fm(:,j)'.*xv'*xv/sumf(j);
+%    p = ones(nx,1)*fm(:,j)'.*xv'*xv;
+    if rcond(p)<1e-15;
+        [ev,ei]=eig(p);
+        ei(find(ei<max(diag(ei))*1e-15))=max(diag(ei))*1e-15;
+        ei=diag(diag(ei));
+        p=ev*ei*inv(ev);	
+	 end
+% Calculate distances
+    M = (det(p)/rho(j))^inx*inv(p);
+    d(:,j) = sum((xv*M.*xv)')';
+% Calculate eigen vectors and cluster prototypes (lines)
+    if s ~= 0 & nx < 3,
+      [ev,ed] = eig(p); ed = diag(ed);
+      ev = ev(:,ed == min(ed));
+      lines(:,j) = -x(:,1)*ev(1)/ev(2) + v(j,:)*ev/ev(2);
+      mask = find(f0 < 0.2);                   % find membership degrees < 0.2
+      lines(mask) = NaN*ones(size(mask));      % mask with NaN's for plots
+    end;
+  end;
+  J(iter) = sum(sum(f0.*d));
+% Update f0
+  d = (d+1e-10).^(-1/(m-1));
+  f0 = (d ./ (sum(d')'*ones(1,c)));
+  
+% Plot intermediate results
+  if (s ~= 0), fprintf('Iteration count = %d, J = %f\n\n',iter,max(max(f-f0))),
+    if (nx < 3),
+      H = get(gcf,'UserData');
+      set(H(2),'xdata',v(:,1),'ydata',v(:,2));
+      for i = 1 : c,
+        set(H(2+i),'ydata',lines(:,i));
+        set(H(2+c+i),'ydata',f0(:,i));
+      end;
+      drawnow;
+    end;
+  end;
+end
+
+fm = f0.^m; sumf = sum(fm);
+
+P = zeros(nx,nx,c);             % covariance matrix
+M = P;                          % norm-inducing matrix
+V = zeros(c,nx);                % eigenvectors
+D = V;                          % eigenvalues
+
+% calculate P,V,D,M
+for j = 1 : c,                        % for all clusters
+    xv = x - ones(mx,1)*v(j,:);
+% Calculate covariance matrix
+    p = ones(nx,1)*fm(:,j)'.*xv'*xv/sumf(j);
+    if rcond(p)<1e-15;
+        [ev,ei]=eig(p);
+        ei(find(ei<max(diag(ei))*1e-15))=max(diag(ei))*1e-15;
+        ei=diag(diag(ei));
+        p=ev*ei*inv(ev);	
+	 end
+% Calculate eigen values and eigen vectors
+    [ev,ed] = eig(p); ed = diag(ed)';
+    ev = ev(:,ed == min(ed));
+% Put cluster info in one matrix
+    P(:,:,j) = p;
+    M(:,:,j) = (det(p)/rho(j)).^(1/nx)*inv(p);
+    V(j,:) = ev(:,end)';
+    D(j,:) = ed;
+end;
