@@ -7,14 +7,18 @@ import Preprocessing, Preprocessing3
 # folder = r"path_to_your_folder\FMID5\\"
 # Change the folder path 
 
-Preprocessing3
-
 # Loading the saved variables
 saved_data = np.load('saved_data.npz')
+
+# Retrieve the variables from the loaded file
 testingData = saved_data['testingData']
 testingClass = saved_data['testingClass']
 trainingData = saved_data['trainingData']
-# Repeat this for other variables
+trainingClass = saved_data['trainingClass']
+testingDataLing = saved_data['testingDataLing']
+testingClassLing = saved_data['testingClassLing']
+trainingDataLing = saved_data['trainingDataLing']
+trainingClassLing = saved_data['trainingClassLing']
 
 print('\nSmart Detector by Ricardo Chin\n')
 print('This program detects fake news automatically using metadata\n')

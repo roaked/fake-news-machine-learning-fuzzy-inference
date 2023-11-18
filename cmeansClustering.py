@@ -3,16 +3,19 @@ from sklearn.metrics import accuracy_score
 # pip install -U scikit-fuzzy
 from skfuzzy import cmeans
 from scipy.spatial import distance
-import Preprocessing3
-
-Preprocessing3
 
 # Loading the saved variables
 saved_data = np.load('saved_data.npz')
+
+# Retrieve the variables from the loaded file
 testingData = saved_data['testingData']
 testingClass = saved_data['testingClass']
 trainingData = saved_data['trainingData']
-# Repeat this for other variables
+trainingClass = saved_data['trainingClass']
+testingDataLing = saved_data['testingDataLing']
+testingClassLing = saved_data['testingClassLing']
+trainingDataLing = saved_data['trainingDataLing']
+trainingClassLing = saved_data['trainingClassLing']
 
 
 def cmeansClustering(trainingData, testingData, testingClass):
@@ -24,9 +27,22 @@ def cmeansClustering(trainingData, testingData, testingClass):
     for p in p_values:
             # Fuzzy C-means clustering with varying p values
             options = dict(c=p, m=2, error=0.0000001, maxiter=150)
-            centersCM, _ = cmeans(trainingData.T, 6, 2, error=0.0000001, maxiter=150)
+            centersCM, *_ = cmeans(trainingData.T, 6, 2, error=0.0000001, maxiter=150)
 
-            # Calculate distances between testing data and cluster centers
+        
+            # Possible reshaping or transposition if needed
+            centersCM = centersCM.T  # Transpose centersCM if necessary
+
+            # Transpose testingData to align shapes
+            testingData = testingData    
+            # testingData = testingData.reshape(new_shape)  # Reshape testingData if necessary
+
+            # Check shapes
+            print(testingData.shape)
+            print(centersCM.shape)
+
+
+            # Perform subtraction
             dist = np.zeros((centersCM.shape[0], testingData.shape[1]))
             for i in range(testingData.shape[1]):
                 for j in range(centersCM.shape[0]):
@@ -51,7 +67,7 @@ def cmeansClustering(trainingData, testingData, testingClass):
     maximum = max(cmeansAcc)
     highestExponent = (np.where(np.array(cmeansAcc) == maximum)[0][0] + 1.1) / 10
     options = dict(c=highestExponent, m=2, error=0.0000001, maxiter=150)
-    centersCM, _ = cmeans(trainingData.T, 6, 2, error=0.0000001, maxiter=150)
+    centersCM, *_ = cmeans(trainingData.T, 6, 2, error=0.0000001, maxiter=150)
 
     # Repeat the clustering process with the p value that yielded the highest accuracy
     dist = np.zeros((centersCM.shape[0], testingData.shape[1]))
@@ -68,7 +84,6 @@ def cmeansClustering(trainingData, testingData, testingClass):
     cmeansCluster = [1 if c != fakeCMeans else 0 for c in cluster]
 
     return cmeansTest, cmeansCluster, cmeansAcc, highestExponent
-
 
 # Call the function
 [cmeansTest, cmeansCluster, cmeansAcc, exponentValue] = cmeansClustering(trainingData, testingData, testingClass)
