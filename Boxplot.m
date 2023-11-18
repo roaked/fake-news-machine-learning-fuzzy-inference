@@ -8,7 +8,7 @@ load('metaTargets.mat');
 % %Choosing only 4 parameters of the news (the ones that seem more important)
 % metaInputs2 = metaInputs([1 2 3 19],:);
 % testingdata = metaInputs(1:4:end,:);
-
+%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% features %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
