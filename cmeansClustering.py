@@ -5,20 +5,6 @@ from skfuzzy import cmeans
 import skfuzzy as fuzz
 from scipy.spatial import distance
 
-# Loading the saved variables
-saved_data = np.load('saved_data.npz')
-
-# Retrieve the variables from the loaded file
-testingData = saved_data['testingData']
-testingClass = saved_data['testingClass']
-trainingData = saved_data['trainingData']
-trainingClass = saved_data['trainingClass']
-testingDataLing = saved_data['testingDataLing']
-testingClassLing = saved_data['testingClassLing']
-trainingDataLing = saved_data['trainingDataLing']
-trainingClassLing = saved_data['trainingClassLing']
-
-
 def cmeansClustering(trainingData, testingData, testingClass):
     # Generating a range of values from 1.1 to 3.5 with steps of 0.1
     p_values = np.arange(1.1, 3.6, 0.1)
@@ -113,6 +99,3 @@ def cmeansClustering(trainingData, testingData, testingClass):
     cmeansCluster = [1 if c != fakeCMeans else 0 for c in cluster]
 
     return cmeansTest, cmeansCluster, cmeansAcc, highestExponent
-
-# Call the function
-[cmeansTest, cmeansCluster, cmeansAcc, exponentValue] = cmeansClustering(trainingData, testingData, testingClass)

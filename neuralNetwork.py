@@ -27,6 +27,8 @@ def neuralNetwork(trainingData, trainingClass):
     inputsNN = trainingData
     targetsNN = trainingClass[:, 0]
 
+    print(inputsNN)
+
     print('\nPick an option for the neural network:\n')
     print('1:[5] 2:[10] 3:[15]\n')
     print('4:[2 2] 5:[5 5] 6:[10 10]\n')
@@ -64,25 +66,21 @@ def neuralNetwork(trainingData, trainingClass):
     # Train-test split the data
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.2, random_state=42)
 
-    print(test_targets)
-    print(test_inputs)
-
     # Define the model
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(units, activation='relu', input_shape=(train_inputs.shape[1],)) for units in hiddenSize
     ])
     model.add(tf.keras.layers.Dense(1)) # Assuming single output
 
-
     # Compile the model
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.05), loss='mean_squared_error')
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), loss='mean_squared_error')
 
      # Train the model and record the history to get the loss curve
     history = model.fit(train_inputs, train_targets, epochs=25, batch_size=32, validation_data=(test_inputs, test_targets))
 
         # Generate predictions on the test set
     y_pred = model.predict(test_inputs)
-    #y_pred = (y_pred > 0.5).astype(int)
+    y_pred = (y_pred > 0.5).astype(int)
     y_true = test_targets
 
     # Predict on the training set for performance evaluation
