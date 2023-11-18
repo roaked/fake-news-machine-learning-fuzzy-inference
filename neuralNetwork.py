@@ -60,26 +60,38 @@ def neuralNetwork(trainingData, trainingClass):
         hiddenSize = (4, 4, 4, 4)
 
 
-    
 
     # Train-test split the data
-    train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.1, random_state=42)
+    train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.2, random_state=42)
+
+    print(test_targets)
+    print(test_inputs)
 
     # Define the model
     model = tf.keras.Sequential([
         tf.keras.layers.Dense(units, activation='relu', input_shape=(train_inputs.shape[1],)) for units in hiddenSize
     ])
-    model.add(tf.keras.layers.Dense(1))  # Assuming single output
+    model.add(tf.keras.layers.Dense(1)) # Assuming single output
+
 
     # Compile the model
-    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.05), loss='mean_squared_error')
 
      # Train the model and record the history to get the loss curve
-    history = model.fit(train_inputs, train_targets, epochs=50, batch_size=32, validation_data=(test_inputs, test_targets))
+    history = model.fit(train_inputs, train_targets, epochs=25, batch_size=32, validation_data=(test_inputs, test_targets))
+
+        # Generate predictions on the test set
+    y_pred = model.predict(test_inputs)
+    #y_pred = (y_pred > 0.5).astype(int)
+    y_true = test_targets
+
+    # Predict on the training set for performance evaluation
+    outputsNN = model.predict(train_inputs)
+    performanceNN = model.evaluate(train_inputs, train_targets)  # Get the evaluation metric from training
 
 
     # Create subplots for various visualizations
-    axs = plt.subplots(2, 2, figsize=(12, 10))
+    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
 
     # Get the loss curve from history
     loss_curve = history.history['loss']
@@ -88,39 +100,13 @@ def neuralNetwork(trainingData, trainingClass):
     axs[1, 0].plot(loss_curve)
     axs[1, 0].set_title('Loss Curve')
 
-    print(test_inputs)
-
-
-    # Generate predictions on the test set
-    predictions = model.predict(test_inputs)
-    y_pred = np.argmax(predictions, axis=1)
-
-    #if len(test_targets.shape) > 1:
-    #    y_true = np.argmax(test_targets, axis=1)
-    #else:
-    #    y_true = test_targets
-    print(test_targets)
-
-    # Predict on the test set
-    #y_pred = model.predict(test_inputs)
-    y_true = test_targets
-
-    # Predict on the training set for performance evaluation
-    outputsNN = model.predict(train_inputs)
-    performanceNN = model.evaluate(train_inputs, train_targets)  # Get the evaluation metric from training
-
-    # Create and display the confusion matrix
-    threshold = 0.5  # Set an appropriate threshold 
-    y_pred_binary = (y_pred > threshold).astype(int)
+    # Confusion Matrix
     conf_matrix = confusion_matrix(y_true, y_pred)
-
-    #conf_matrix = confusion_matrix(y_true, y_pred)
     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
     axs[1, 1].set_title('Confusion Matrix')
 
-
     # Calculate errors and plot error histogram
-    errors = test_targets - predictions
+    errors = test_targets - y_pred
     axs[0, 1].hist(errors.flatten(), bins=50, alpha=0.5, color='orange', edgecolor='black')
     axs[0, 1].set_title('Error Histogram')
 
