@@ -42,8 +42,13 @@ def confusionmatStats(group, grouphat=None):
     FP = np.sum(value1, axis=0) - TP
     FN = np.sum(value1, axis=1) - TP
 
-    # Ensure TN calculation doesn't encounter index out of bounds error
-    TN = [np.sum(value1) - np.sum(np.delete(np.delete(value1, i, axis=0), i, axis=1)) + TP[i] for i in range(numOfClasses)]
+    # Calculate TN without deletions
+    TN = []
+    for i in range(numOfClasses):
+        mask = np.ones_like(value1, dtype=bool)
+        mask[i, :] = False  # Exclude the i-th row
+        mask[:, i] = False  # Exclude the i-th column
+        TN.append(np.sum(value1[mask]) + TP[i])
 
     sensitivity = TP / (TP + FN)
     specificity = np.array(TN) / (np.array(FP) + np.array(TN))
