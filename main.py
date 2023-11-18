@@ -70,8 +70,7 @@ while True:
                 break
 
             elif option2 == 1:
-                cmeansTest, cmeansCluster, cmeansAcc, exponentValue = cmeansClustering(training_data, testing_data,
-                                                                                        testing_class)
+                cmeansTest, cmeansCluster, cmeansAcc, exponentValue = cmeansClustering(training_data, testing_data,testing_class)
                 plt.figure(1), plt.plotconfusion(cmeansTest, cmeansCluster)
                 plt.title('Confusion Matrix of C-Means Clustering')
 
