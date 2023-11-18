@@ -1,15 +1,25 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import Preprocessing3
 import seaborn as sns 
 from sklearn.metrics import confusion_matrix
-from sklearn.neural_network import MLPRegressor
 import tensorflow as tf
+from neuralNetwork import neuralNetwork
 from sklearn.model_selection import train_test_split
+
+Preprocessing3
+
+# Loading the saved variables
+saved_data = np.load('saved_data.npz')
+trainingData = saved_data['trainingData']
+trainingClass = saved_data['trainingClass']
+
 
 # Function to get model weights
 def get_model_weights(model):
     return [layer.get_weights() for layer in model.layers]
    
+history, model, targetsNN, outputsNN, performanceNN, _, y_pred, y_true, _, loss_curve = neuralNetwork(trainingData, trainingClass)
 
 def neuralNetwork(trainingData, trainingClass):
     trainingData = trainingData.T
@@ -102,6 +112,7 @@ def neuralNetwork(trainingData, trainingClass):
     #else:
     #    y_true = test_targets
 
+
     # Predict on the test set
     y_pred = model.predict(test_inputs)
     y_true = test_targets
@@ -111,7 +122,11 @@ def neuralNetwork(trainingData, trainingClass):
     performanceNN = model.evaluate(train_inputs, train_targets)  # Get the evaluation metric from training
 
     # Create and display the confusion matrix
-    conf_matrix = confusion_matrix(y_true, y_pred)
+    threshold = 0.5  # Set an appropriate threshold 
+    y_pred_binary = (y_pred > threshold).astype(int)
+    conf_matrix = confusion_matrix(y_true, y_pred_binary)
+
+    #conf_matrix = confusion_matrix(y_true, y_pred)
     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
     axs[1, 1].set_title('Confusion Matrix')
 
