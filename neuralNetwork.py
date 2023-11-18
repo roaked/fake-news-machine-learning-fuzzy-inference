@@ -3,6 +3,7 @@ import numpy as np
 import Preprocessing3
 import seaborn as sns 
 from sklearn.metrics import confusion_matrix
+from confusionmatStats import confusionmatStats
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
@@ -100,6 +101,12 @@ def neuralNetwork(trainingData, trainingClass):
 
     # Confusion Matrix
     conf_matrix = confusion_matrix(y_true, y_pred)
+    stats = confusionmatStats(y_true, y_pred)
+    # Print the statistics
+    print("Additional Statistics:")
+    for key, value in stats.items():
+        print(f"{key}: {value:.4f}" if isinstance(value, float) else f"{key}: {value}")
+        
     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
     axs[1, 1].set_title('Confusion Matrix')
 

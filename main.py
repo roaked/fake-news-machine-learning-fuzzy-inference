@@ -97,10 +97,8 @@ while selec == 0:
             plt.show()
 
         elif option2 == 2:
-            kmeansTest, kmeansCluster = kmeansClustering(trainingData1, testingData1, testingClass1)
-            plt.plotconfusion(kmeansTest, kmeansCluster)
-            plt.title('Confusion Matrix of K-Means Clustering')
-            plt.show()
+            kmeansTest, kmeansCluster, conf_matrix = kmeansClustering(trainingData1, testingData1, testingClass1)
+        
 
         elif option2 == 3:
             MaxAccuracy, Ym, YClassOptimal, YClass, FM, clusterNumber = fuzzyModel(trainingData1, trainingClass1,
