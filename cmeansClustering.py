@@ -60,4 +60,4 @@ def cmeansClustering(trainingData, testingData, testingClass):
 
 
 # Call the function
-[cmeansTest, cmeansCluster, cmeansAcc, exponentValue] = cmeansClustering(trainingData, testingData, testingClass)
+#[cmeansTest, cmeansCluster, cmeansAcc, exponentValue] = cmeansClustering(trainingData, testingData, testingClass)
