@@ -10,17 +10,21 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
     DAT = {'U': Input, 'Y': Output}
     clusterNumber = [2]  # Initial cluster number
 
+    # Initializing variables to store results
     MaxAccuracy = []
     Ym = []
     YClassOptimal = []
     YClass = []
     FM = []
 
+    # Iterating over different cluster numbers
     for j in range(20):
-        clusterNumber.append(clusterNumber[0] + j)
+        clusterNumber.append(clusterNumber[0] + j)  # Generating cluster numbers
 
-        STR = {'c': clusterNumber[j+1]}
-        FM, _ = fmclust(DAT, STR)
+        STR = {'c': clusterNumber[j+1]}  # Setting the current cluster number
+        FM, _ = fmclust(DAT, STR)  # Fuzzy clustering
+
+        # Computing similarity between testing data and clusters
         Ym, _, _, _, _ = fmsim(testingData.T, testingClass.T, FM)
 
         Threshold = 0.00
@@ -37,8 +41,10 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
 
             Threshold += 0.01
 
+        # Classifying based on the optimal threshold
         YClassOptimal = [1 if y > MaxThreshold else 0 for y in Ym]
 
+    # Finding the highest accuracy achieved
     maximum = max(MaxAccuracy)
     highestCluster = MaxAccuracy.index(maximum)
     STR = {'c': clusterNumber[highestCluster + 1]}
@@ -49,6 +55,8 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
     MaxAccuracy = 0.00
     MaxThreshold = 0.00
 
+    # Finding the optimal threshold for classification with the selected cluster number
+
     while Threshold < 1.00:
         YClass = [1 if y > Threshold else 0 for y in Ym]
 
@@ -58,7 +66,8 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
             MaxThreshold = Threshold
 
         Threshold += 0.01
-
+        
+    # Classifying based on the optimal threshold and returning results
     YClassOptimal = [1 if y > MaxThreshold else 0 for y in Ym]
 
     return MaxAccuracy, Ym, YClassOptimal, YClass, FM, clusterNumber
