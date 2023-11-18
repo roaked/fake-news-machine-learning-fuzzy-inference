@@ -1,7 +1,8 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
 # pip install -U scikit-fuzzy
-from skfuzzy import cmeans, fcm
+from skfuzzy import cmeans
+import skfuzzy as fuzz
 from scipy.spatial import distance
 
 # Loading the saved variables
@@ -25,9 +26,16 @@ def cmeansClustering(trainingData, testingData, testingClass):
 
     # Loop through the range of p values
     for p in p_values:
+        
             # Fuzzy C-means clustering with varying p values
             options = dict(c=p, m=2, error=0.0000001, maxiter=150)
-            centersCM, *_ = fcm(trainingData.T, 6, **options)  # 6 clusters
+            centersCM, u, _, _, _, _, _ = fuzz.cluster.cmeans(
+                trainingData.T,
+                6,
+                p,
+                error=0.0000001,
+                maxiter=150
+            )  # 6 clusters
 
         
             # # Possible reshaping or transposition if needed
@@ -37,16 +45,29 @@ def cmeansClustering(trainingData, testingData, testingClass):
             # testingData = testingData    
             # # testingData = testingData.reshape(new_shape)  # Reshape testingData if necessary
 
-            # # Check shapes
-            # print(testingData.shape)
-            # print(centersCM.shape)
+            print(testingData.shape)
+            print(centersCM.shape)
 
 
-            # Perform subtraction
+            # Assuming centersCM and testingData are initialized appropriately
+            # Initialize dist matrix to store distances
             dist = np.zeros((centersCM.shape[0], testingData.shape[1]))
-            for i in range(testingData.shape[1]):
-                for j in range(centersCM.shape[0]):
-                    totalDelta = np.sum((testingData[:, i] - centersCM[j])**2)
+
+            # Loop through each testing data point and each cluster center
+            for i in range(testingData.shape[1]): # Loop over each testing data point
+                for j in range(centersCM.shape[0]): # Loop over each cluster center
+                    totalDelta = 0 # Initialize total delta for each cluster center
+
+                    
+                    for k in range(testingData.shape[0]):  # Iterate through the rows of testingData
+                        # Calculate the squared difference between each parameter of the testing data point
+                        # and each cluster center, and accumulate the total delta
+                        delta = (testingData[k, i] - centersCM[j, k])**2
+                        totalDelta += delta
+
+                    
+                    
+                    # Calculate the square root of the accumulated totalDelta and store in the dist matrix
                     dist[j, i] = np.sqrt(totalDelta)
 
             # Assign data points to clusters based on minimum distance
@@ -66,14 +87,22 @@ def cmeansClustering(trainingData, testingData, testingClass):
     # Find the p value with the highest accuracy
     maximum = max(cmeansAcc)
     highestExponent = (np.where(np.array(cmeansAcc) == maximum)[0][0] + 1.1) / 10
-    options = dict(c=highestExponent, m=2, error=0.0000001, maxiter=150)
-    centersCM, *_ = fcm(trainingData.T, 6, **options)  # 6 clusters
+    centersCM, u, _, _, _, _, _ = fuzz.cluster.cmeans(
+        trainingData.T,
+        6,
+        highestExponent,
+        error=0.0000001,
+        maxiter=150
+    )  # 6 clusters
 
-    # Repeat the clustering process with the p value that yielded the highest accuracy
+    # Perform subtraction
     dist = np.zeros((centersCM.shape[0], testingData.shape[1]))
     for i in range(testingData.shape[1]):
         for j in range(centersCM.shape[0]):
-            totalDelta = np.sum((testingData[:, i] - centersCM[j])**2)
+            totalDelta = 0
+            for k in range(testingData.shape[0]):  # Iterate through the rows of testingData
+                delta = (testingData[k, i] - centersCM[j, k])**2
+                totalDelta += delta
             dist[j, i] = np.sqrt(totalDelta)
 
     cluster = np.argmin(dist, axis=0)
