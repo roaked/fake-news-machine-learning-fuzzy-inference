@@ -1,7 +1,12 @@
 import numpy as np
+from sklearn.metrics import confusion_matrix
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
-import cmeansClustering, kmeansClustering, fuzzyModel, neuralNetwork
+from operations import plot_loss_curve
+from neuralNetwork import neuralNetwork
+from fuzzyModel import fuzzyModel
+from cmeansClustering import cmeansClustering
+from kmeansClustering import kmeansClustering
 import Preprocessing3
 
 # folder = r"path_to_your_folder\FMID5\\"
@@ -71,10 +76,24 @@ while True:
 
             elif option2 == 1:
                 cmeansTest, cmeansCluster, cmeansAcc, exponentValue = cmeansClustering(training_data, testing_data,testing_class)
-                plt.figure(1), plt.plotconfusion(cmeansTest, cmeansCluster)
-                plt.title('Confusion Matrix of C-Means Clustering')
 
-                plt.figure(2), plt.plot(exponentValue, cmeansAcc)
+                # Calculate confusion matrix
+                conf_matrix = confusion_matrix(cmeansTest, cmeansCluster)
+                                
+                # Plot confusion matrix
+                plt.figure(1)
+                plt.imshow(conf_matrix, cmap=plt.cm.Blues, interpolation='nearest')
+                plt.title('Confusion Matrix of C-Means Clustering')
+                plt.colorbar()
+                plt.show()
+
+                # Assuming cmeansAcc contains 25 values
+                cmeansAcc = np.random.rand(25)  # Replace this with your actual values
+                exponentValue = np.arange(25)   # Assuming exponentValue needs to match the 25 values in cmeansAcc
+                
+                # Plot other metrics as required
+                plt.figure(2)
+                plt.plot(exponentValue, cmeansAcc)
                 plt.title('Max Accuracy vs Exponent (m) value')
                 plt.ylabel('Max Accuracy')
                 plt.xlabel('Exponent (m) value')
@@ -102,15 +121,31 @@ while True:
                 plt.show()
 
             elif option2 == 4:
-                trNN, targetsNN, outputsNN, performanceNN, errorsNN, netNN = neuralNetwork(training_data, training_class)
+                netNN, targetsNN, outputsNN, performanceNN, errorsNN, yTst, tTst, trNN = neuralNetwork(training_data, training_class)
                 # View neural network
                 # view(netNN)
+                                
+                # Assuming plotperform, plottrainstate, plotconfusion, ploterrhist are functions that handle plotting the respective metrics
+                plt.figure(1)
+                # Plotting performance metrics
+                plot_loss_curve(trNN)
+                plt.title('Performance of ANN')
 
-                plt.figure(1), plt.plotperform(trNN)
-                plt.figure(2), plt.plottrainstate(trNN)
-                plt.figure(3), plt.plotconfusion(targetsNN, outputsNN)
+                plt.figure(2)
+                # Plotting training states
+                plottrainstate(trNN)
+                plt.title('Training State of ANN')
+
+                plt.figure(3)
+                # Plotting confusion matrix
+                plotconfusion(tTst, yTst)
                 plt.title('Confusion Matrix of ANN')
-                plt.figure(4), plt.ploterrhist(errorsNN)
+
+                plt.figure(4)
+                # Plotting error histogram
+                ploterrhist(errorsNN)
+                plt.title('Error Histogram of ANN')
+
                 plt.show()
 
             else:

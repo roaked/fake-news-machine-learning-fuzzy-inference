@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.neural_network import MLPRegressor
+from sklearn.model_selection import train_test_split
 
 def neuralNetwork(trainingData, trainingClass):
     trainingData = trainingData.T
@@ -43,15 +44,23 @@ def neuralNetwork(trainingData, trainingClass):
     # Create the neural network model
     netNN = MLPRegressor(hidden_layer_sizes=hiddenSize, solver='lbfgs', max_iter=10000)
 
+    # Train-test split the data (example split, adjust as needed)
+    train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.2, random_state=42)
+
     # Train the neural network
-    netNN.fit(inputsNN, targetsNN)
+    netNN.fit(train_inputs, train_targets)
 
-    # Predict on the training set
-    outputsNN = netNN.predict(inputsNN)
-    performanceNN = netNN.score(inputsNN, targetsNN)
-    errorsNN = targetsNN - outputsNN
+    # Predict on the test set
+    yTst = netNN.predict(test_inputs)
+    tTst = test_targets
+    trNN = netNN
 
-    return netNN, targetsNN, outputsNN, performanceNN, errorsNN
+    # Predict on the training set for performance evaluation
+    outputsNN = netNN.predict(train_inputs)
+    performanceNN = netNN.score(train_inputs, train_targets)
+    errorsNN = train_targets - outputsNN
+
+    return netNN, targetsNN, outputsNN, performanceNN, errorsNN, yTst, tTst, trNN
 
 
 
