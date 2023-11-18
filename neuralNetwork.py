@@ -4,22 +4,21 @@ import Preprocessing3
 import seaborn as sns 
 from sklearn.metrics import confusion_matrix
 import tensorflow as tf
-from neuralNetwork import neuralNetwork
 from sklearn.model_selection import train_test_split
 
-Preprocessing3
+#Preprocessing3
 
 # Loading the saved variables
-saved_data = np.load('saved_data.npz')
-trainingData = saved_data['trainingData']
-trainingClass = saved_data['trainingClass']
+#saved_data = np.load('saved_data.npz')
+#trainingData = saved_data['trainingData']
+#trainingClass = saved_data['trainingClass']
 
 
 # Function to get model weights
 def get_model_weights(model):
     return [layer.get_weights() for layer in model.layers]
    
-history, model, targetsNN, outputsNN, performanceNN, _, y_pred, y_true, _, loss_curve = neuralNetwork(trainingData, trainingClass)
+#history, model, targetsNN, outputsNN, performanceNN, _, y_pred, y_true, _, loss_curve = neuralNetwork(trainingData, trainingClass)
 
 def neuralNetwork(trainingData, trainingClass):
     trainingData = trainingData.T
@@ -64,7 +63,7 @@ def neuralNetwork(trainingData, trainingClass):
     
 
     # Train-test split the data
-    train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.2, random_state=42)
+    train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.1, random_state=42)
 
     # Define the model
     model = tf.keras.Sequential([
@@ -72,26 +71,15 @@ def neuralNetwork(trainingData, trainingClass):
     ])
     model.add(tf.keras.layers.Dense(1))  # Assuming single output
 
-    initial_weights = get_model_weights(model) # Get weights before training
-
     # Compile the model
-    model.compile(optimizer='adam', loss='mean_squared_error')
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss='mean_squared_error')
 
      # Train the model and record the history to get the loss curve
-    history = model.fit(train_inputs, train_targets, epochs=20, batch_size=32, validation_data=(test_inputs, test_targets))
+    history = model.fit(train_inputs, train_targets, epochs=50, batch_size=32, validation_data=(test_inputs, test_targets))
 
-    final_weights = get_model_weights(model) # Get weights after training
 
     # Create subplots for various visualizations
-    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-
-    # Compare weights before and after training
-    for i, (initial_layer_weights, final_layer_weights) in enumerate(zip(initial_weights, final_weights)):
-        weight_changes = [fw - iw for iw, fw in zip(initial_layer_weights, final_layer_weights)]
-        ax = axs[i // 2, i % 2]
-        ax.hist(weight_changes[0].flatten(), bins=50, alpha=0.5, label='Layer {} Weights'.format(i))
-        ax.set_title('Weight Changes in Layer {}'.format(i))
-        ax.legend()
+    axs = plt.subplots(2, 2, figsize=(12, 10))
 
     # Get the loss curve from history
     loss_curve = history.history['loss']
@@ -105,16 +93,16 @@ def neuralNetwork(trainingData, trainingClass):
 
     # Generate predictions on the test set
     predictions = model.predict(test_inputs)
-    #y_pred = np.argmax(predictions, axis=1)
+    y_pred = np.argmax(predictions, axis=1)
 
     #if len(test_targets.shape) > 1:
     #    y_true = np.argmax(test_targets, axis=1)
     #else:
     #    y_true = test_targets
-
+    print(test_targets)
 
     # Predict on the test set
-    y_pred = model.predict(test_inputs)
+    #y_pred = model.predict(test_inputs)
     y_true = test_targets
 
     # Predict on the training set for performance evaluation
@@ -124,7 +112,7 @@ def neuralNetwork(trainingData, trainingClass):
     # Create and display the confusion matrix
     threshold = 0.5  # Set an appropriate threshold 
     y_pred_binary = (y_pred > threshold).astype(int)
-    conf_matrix = confusion_matrix(y_true, y_pred_binary)
+    conf_matrix = confusion_matrix(y_true, y_pred)
 
     #conf_matrix = confusion_matrix(y_true, y_pred)
     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
