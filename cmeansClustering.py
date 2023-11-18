@@ -3,6 +3,7 @@ from sklearn.metrics import accuracy_score
 # pip install -U scikit-fuzzy
 from skfuzzy import cmeans
 import skfuzzy as fuzz
+from confusionmatStats import confusionmatStats
 from scipy.spatial import distance
 
 def cmeansClustering(trainingData, testingData, testingClass):
@@ -97,5 +98,13 @@ def cmeansClustering(trainingData, testingData, testingClass):
 
     # Classify based on the most frequent cluster
     cmeansCluster = [1 if c != fakeCMeans else 0 for c in cluster]
+
+    # Compute additional statistics
+    stats = confusionmatStats(cmeansTest, cmeansCluster)
+
+    # Print the statistics
+    print("Additional Statistics:")
+    for key, value in stats.items():
+        print(f"{key}: {value:.4f}" if isinstance(value, float) else f"{key}: {value}")
 
     return cmeansTest, cmeansCluster, cmeansAcc, highestExponent

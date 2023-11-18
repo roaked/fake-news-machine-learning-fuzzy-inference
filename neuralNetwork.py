@@ -76,10 +76,10 @@ def neuralNetwork(trainingData, trainingClass):
     # Compile the model
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.01), loss='mean_squared_error')
 
-     # Train the model and record the history to get the loss curve
+    # Train the model and record the history to get the loss curve
     history = model.fit(train_inputs, train_targets, epochs=25, batch_size=32, validation_data=(test_inputs, test_targets))
 
-        # Generate predictions on the test set
+    # Generate predictions on the test set
     y_pred = model.predict(test_inputs)
     y_pred = (y_pred > 0.5).astype(int)
     y_true = test_targets
@@ -106,7 +106,7 @@ def neuralNetwork(trainingData, trainingClass):
     print("Additional Statistics:")
     for key, value in stats.items():
         print(f"{key}: {value:.4f}" if isinstance(value, float) else f"{key}: {value}")
-        
+
     sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
     axs[1, 1].set_title('Confusion Matrix')
 
