@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
-from skfuzzy import fmclust, fmsim
+import skfuzzy as fuzz
 from confusionmatStats import confusionmatStats  # You'll need to define or import this function
 
 def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
@@ -22,10 +22,10 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
         clusterNumber.append(clusterNumber[0] + j)  # Generating cluster numbers
 
         STR = {'c': clusterNumber[j+1]}  # Setting the current cluster number
-        FM, _ = fmclust(DAT, STR)  # Fuzzy clustering
+        FM, _ = fuzz.fmclust(DAT, STR)  # Fuzzy clustering
 
         # Computing similarity between testing data and clusters
-        Ym, _, _, _, _ = fmsim(testingData.T, testingClass.T, FM)
+        Ym, _, _, _, _ = fuzz.fmsim(testingData.T, testingClass.T, FM)
 
         Threshold = 0.00
         MaxAccuracy.append(0.00)
@@ -48,8 +48,8 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
     maximum = max(MaxAccuracy)
     highestCluster = MaxAccuracy.index(maximum)
     STR = {'c': clusterNumber[highestCluster + 1]}
-    FM, _ = fmclust(DAT, STR)
-    Ym, _, _, _, _ = fmsim(testingData.T, testingClass.T, FM)
+    FM, _ = fuzz.fmclust(DAT, STR)
+    Ym, _, _, _, _ = fuzz.fmsim(testingData.T, testingClass.T, FM)
 
     Threshold = 0.00
     MaxAccuracy = 0.00
