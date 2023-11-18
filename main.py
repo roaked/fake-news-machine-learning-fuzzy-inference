@@ -2,10 +2,12 @@ import numpy as np
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import cmeansClustering, kmeansClustering, fuzzyModel, neuralNetwork
-import Preprocessing, Preprocessing3
+import Preprocessing3
 
 # folder = r"path_to_your_folder\FMID5\\"
 # Change the folder path 
+
+Preprocessing3
 
 # Loading the saved variables
 saved_data = np.load('saved_data.npz')

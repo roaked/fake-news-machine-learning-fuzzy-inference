@@ -45,8 +45,8 @@ def cmeansClustering(trainingData, testingData, testingClass):
             # testingData = testingData    
             # # testingData = testingData.reshape(new_shape)  # Reshape testingData if necessary
 
-            print(testingData.shape)
-            print(centersCM.shape)
+            # print(testingData.shape)
+            # print(centersCM.shape)
 
 
             # Assuming centersCM and testingData are initialized appropriately
