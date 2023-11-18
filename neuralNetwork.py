@@ -9,59 +9,7 @@ from sklearn.model_selection import train_test_split
 # Function to get model weights
 def get_model_weights(model):
     return [layer.get_weights() for layer in model.layers]
-
-# Function to plot the training state before and after
-def plot_train_state_before_after(train_inputs, train_targets, test_inputs, test_targets, model):
-    initial_weights = get_model_weights(model)
-
-    # Train the model and record the history to get the loss curve
-    history = model.fit(train_inputs, train_targets, epochs=20, batch_size=32, validation_data=(test_inputs, test_targets))
-
-    final_weights = get_model_weights(model)
-
-    # Create subplots for various visualizations
-    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
-
-    # Compare weights before and after training
-    for i, (initial_layer_weights, final_layer_weights) in enumerate(zip(initial_weights, final_weights)):
-        weight_changes = [fw - iw for iw, fw in zip(initial_layer_weights, final_layer_weights)]
-        ax = axs[i // 2, i % 2]
-        ax.hist(weight_changes[0].flatten(), bins=50, alpha=0.5, label='Layer {} Weights'.format(i))
-        ax.set_title('Weight Changes in Layer {}'.format(i))
-        ax.legend()
-
-    # Get the loss curve from history
-    loss_curve = history.history['loss']
-
-    # Plot the loss curve
-    axs[1, 0].plot(loss_curve)
-    axs[1, 0].set_title('Loss Curve')
-
-    print(test_inputs)
-    # Generate predictions on the test set
-    predictions = model.predict(test_inputs)
-    y_pred = np.argmax(predictions, axis=1)
-
-    if len(test_targets.shape) > 1:
-        y_true = np.argmax(test_targets, axis=1)
-    else:
-        y_true = test_targets
-
-    # Create and display the confusion matrix
-    conf_matrix = confusion_matrix(y_true, y_pred)
-    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
-    axs[1, 1].set_title('Confusion Matrix')
-
-
-
-    # Calculate errors and plot error histogram
-    errors = test_targets - predictions
-    axs[0, 1].hist(errors.flatten(), bins=50, alpha=0.5, color='orange', edgecolor='black')
-    axs[0, 1].set_title('Error Histogram')
-
-    # Show the combined plots
-    plt.tight_layout()
-    plt.show()
+   
 
 def neuralNetwork(trainingData, trainingClass):
     trainingData = trainingData.T
@@ -102,6 +50,9 @@ def neuralNetwork(trainingData, trainingClass):
     elif option == 11:
         hiddenSize = (4, 4, 4, 4)
 
+
+    
+
     # Train-test split the data
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.2, random_state=42)
 
@@ -111,26 +62,71 @@ def neuralNetwork(trainingData, trainingClass):
     ])
     model.add(tf.keras.layers.Dense(1))  # Assuming single output
 
+    initial_weights = get_model_weights(model) # Get weights before training
+
     # Compile the model
     model.compile(optimizer='adam', loss='mean_squared_error')
 
      # Train the model and record the history to get the loss curve
     history = model.fit(train_inputs, train_targets, epochs=20, batch_size=32, validation_data=(test_inputs, test_targets))
 
+    final_weights = get_model_weights(model) # Get weights after training
+
+    # Create subplots for various visualizations
+    fig, axs = plt.subplots(2, 2, figsize=(12, 10))
+
+    # Compare weights before and after training
+    for i, (initial_layer_weights, final_layer_weights) in enumerate(zip(initial_weights, final_weights)):
+        weight_changes = [fw - iw for iw, fw in zip(initial_layer_weights, final_layer_weights)]
+        ax = axs[i // 2, i % 2]
+        ax.hist(weight_changes[0].flatten(), bins=50, alpha=0.5, label='Layer {} Weights'.format(i))
+        ax.set_title('Weight Changes in Layer {}'.format(i))
+        ax.legend()
+
+    # Get the loss curve from history
+    loss_curve = history.history['loss']
+
+    # Plot the loss curve
+    axs[1, 0].plot(loss_curve)
+    axs[1, 0].set_title('Loss Curve')
+
+    print(test_inputs)
+
+
+    # Generate predictions on the test set
+    predictions = model.predict(test_inputs)
+    #y_pred = np.argmax(predictions, axis=1)
+
+    #if len(test_targets.shape) > 1:
+    #    y_true = np.argmax(test_targets, axis=1)
+    #else:
+    #    y_true = test_targets
+
     # Predict on the test set
-    yTst = model.predict(test_inputs)
-    tTst = test_targets
+    y_pred = model.predict(test_inputs)
+    y_true = test_targets
 
     # Predict on the training set for performance evaluation
     outputsNN = model.predict(train_inputs)
     performanceNN = model.evaluate(train_inputs, train_targets)  # Get the evaluation metric from training
 
-    # Get the loss curve from history
-    loss_curve = history.history['loss'] 
+    # Create and display the confusion matrix
+    conf_matrix = confusion_matrix(y_true, y_pred)
+    sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', ax=axs[1, 1])
+    axs[1, 1].set_title('Confusion Matrix')
 
-    plot_train_state_before_after(train_inputs, train_targets, test_inputs, test_targets, model)
 
-    return history, model, targetsNN, outputsNN, performanceNN, None, yTst, tTst, None, loss_curve
+    # Calculate errors and plot error histogram
+    errors = test_targets - predictions
+    axs[0, 1].hist(errors.flatten(), bins=50, alpha=0.5, color='orange', edgecolor='black')
+    axs[0, 1].set_title('Error Histogram')
+
+    # Show the combined plots
+    plt.tight_layout()
+    plt.show()
+   
+
+    return history, model, targetsNN, outputsNN, performanceNN, None, y_pred, y_true, None, loss_curve
 
 
 

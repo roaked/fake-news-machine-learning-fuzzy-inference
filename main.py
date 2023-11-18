@@ -121,7 +121,7 @@ while True:
                 plt.show()
 
             elif option2 == 4:
-                history, model, targetsNN, outputsNN, performanceNN, _, yTst, tTst, _, loss_curve = neuralNetwork(training_data, training_class)
+                history, model, targetsNN, outputsNN, performanceNN, _, y_pred, y_true, _, loss_curve = neuralNetwork(training_data, training_class)
                 # View neural network
                 # view(netNN)
 
