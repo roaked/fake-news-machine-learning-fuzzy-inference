@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
-from operations import plot_loss_curve
+from operations import plot_loss_curve, plot_train_state_before_after, plot_confusion_matrix, plot_error_histogram
 from neuralNetwork import neuralNetwork
 from fuzzyModel import fuzzyModel
 from cmeansClustering import cmeansClustering
@@ -11,6 +11,7 @@ import Preprocessing3
 
 # folder = r"path_to_your_folder\FMID5\\"
 # Change the folder path 
+
 
 Preprocessing3
 
@@ -121,29 +122,29 @@ while True:
                 plt.show()
 
             elif option2 == 4:
-                netNN, targetsNN, outputsNN, performanceNN, errorsNN, yTst, tTst, trNN = neuralNetwork(training_data, training_class)
+                history, model, targetsNN, outputsNN, performanceNN, _, yTst, tTst, _, loss_curve = neuralNetwork(training_data, training_class)
                 # View neural network
                 # view(netNN)
                                 
                 # Assuming plotperform, plottrainstate, plotconfusion, ploterrhist are functions that handle plotting the respective metrics
                 plt.figure(1)
-                # Plotting performance metrics
-                plot_loss_curve(trNN)
+                # Plotting performance metrics / fit
+                plot_loss_curve(history)
                 plt.title('Performance of ANN')
 
                 plt.figure(2)
                 # Plotting training states
-                plottrainstate(trNN)
+                plot_train_state_before_after(model)
                 plt.title('Training State of ANN')
 
                 plt.figure(3)
                 # Plotting confusion matrix
-                plotconfusion(tTst, yTst)
+                plot_confusion_matrix(tTst, yTst)
                 plt.title('Confusion Matrix of ANN')
 
                 plt.figure(4)
                 # Plotting error histogram
-                ploterrhist(errorsNN)
+                plot_error_histogram(loss_curve)
                 plt.title('Error Histogram of ANN')
 
                 plt.show()

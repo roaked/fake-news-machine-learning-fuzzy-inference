@@ -1,5 +1,7 @@
+import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.neural_network import MLPRegressor
+import tensorflow as tf
 from sklearn.model_selection import train_test_split
 
 def neuralNetwork(trainingData, trainingClass):
@@ -41,26 +43,40 @@ def neuralNetwork(trainingData, trainingClass):
     elif option == 11:
         hiddenSize = (4, 4, 4, 4)
 
-    # Create the neural network model
-    netNN = MLPRegressor(hidden_layer_sizes=hiddenSize, solver='lbfgs', max_iter=10000)
-
-    # Train-test split the data (example split, adjust as needed)
+    # Train-test split the data
     train_inputs, test_inputs, train_targets, test_targets = train_test_split(inputsNN, targetsNN, test_size=0.2, random_state=42)
 
-    # Train the neural network
-    netNN.fit(train_inputs, train_targets)
+    # Define the model
+    model = tf.keras.Sequential([
+        tf.keras.layers.Dense(units, activation='relu', input_shape=(train_inputs.shape[1],)) for units in hiddenSize
+    ])
+    model.add(tf.keras.layers.Dense(1))  # Assuming single output
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='mean_squared_error')
+
+     # Train the model and record the history to get the loss curve
+    history = model.fit(train_inputs, train_targets, epochs=100, batch_size=32, validation_data=(test_inputs, test_targets))
 
     # Predict on the test set
-    yTst = netNN.predict(test_inputs)
+    yTst = model.predict(test_inputs)
     tTst = test_targets
-    trNN = netNN
 
     # Predict on the training set for performance evaluation
-    outputsNN = netNN.predict(train_inputs)
-    performanceNN = netNN.score(train_inputs, train_targets)
-    errorsNN = train_targets - outputsNN
+    outputsNN = model.predict(train_inputs)
+    performanceNN = model.evaluate(train_inputs, train_targets)  # Get the evaluation metric from training
 
-    return netNN, targetsNN, outputsNN, performanceNN, errorsNN, yTst, tTst, trNN
+    # Get the loss curve from history
+    loss_curve = history.history['loss'] 
+
+        # Plotting the loss curve
+    # plt.plot(loss_curve)
+    # plt.xlabel('Epochs')
+    # plt.ylabel('Loss')
+    # plt.title('Loss Curve during Training')
+    # plt.show()
+
+    return history, model, targetsNN, outputsNN, performanceNN, None, yTst, tTst, None, loss_curve
 
 
 
