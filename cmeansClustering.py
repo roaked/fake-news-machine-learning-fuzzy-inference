@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
 # pip install -U scikit-fuzzy
-from skfuzzy import cmeans
+from skfuzzy import cmeans, fcm
 from scipy.spatial import distance
 
 # Loading the saved variables
@@ -27,19 +27,19 @@ def cmeansClustering(trainingData, testingData, testingClass):
     for p in p_values:
             # Fuzzy C-means clustering with varying p values
             options = dict(c=p, m=2, error=0.0000001, maxiter=150)
-            centersCM, *_ = cmeans(trainingData.T, 6, 2, error=0.0000001, maxiter=150)
+            centersCM, *_ = fcm(trainingData.T, 6, **options)  # 6 clusters
 
         
-            # Possible reshaping or transposition if needed
-            centersCM = centersCM.T  # Transpose centersCM if necessary
+            # # Possible reshaping or transposition if needed
+            # centersCM = centersCM.T  # Transpose centersCM if necessary
 
-            # Transpose testingData to align shapes
-            testingData = testingData    
-            # testingData = testingData.reshape(new_shape)  # Reshape testingData if necessary
+            # # Transpose testingData to align shapes
+            # testingData = testingData    
+            # # testingData = testingData.reshape(new_shape)  # Reshape testingData if necessary
 
-            # Check shapes
-            print(testingData.shape)
-            print(centersCM.shape)
+            # # Check shapes
+            # print(testingData.shape)
+            # print(centersCM.shape)
 
 
             # Perform subtraction
@@ -67,7 +67,7 @@ def cmeansClustering(trainingData, testingData, testingClass):
     maximum = max(cmeansAcc)
     highestExponent = (np.where(np.array(cmeansAcc) == maximum)[0][0] + 1.1) / 10
     options = dict(c=highestExponent, m=2, error=0.0000001, maxiter=150)
-    centersCM, *_ = cmeans(trainingData.T, 6, 2, error=0.0000001, maxiter=150)
+    centersCM, *_ = fcm(trainingData.T, 6, **options)  # 6 clusters
 
     # Repeat the clustering process with the p value that yielded the highest accuracy
     dist = np.zeros((centersCM.shape[0], testingData.shape[1]))
