@@ -1,10 +1,3 @@
-%Intelligent Systems 2019/20
-%Work 4 - Group 7: Fake news automatic detection using metadata
-%Authors:
-%Nº80998  Name: Pedro Miguel Menezes Ramalho
-%Nº85183  Name: Ricardo Miguel Diogo de Oliveira Chin
-%Nº93807  Name: Henrique Manuel Caldeira Pimentel Furtado
-
 clc
 close all
 clear all

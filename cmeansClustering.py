@@ -50,7 +50,7 @@ def cmeansClustering(trainingData, testingData, testingClass):
 
 
             # Assuming centersCM and testingData are initialized appropriately
-            # Initialize dist matrix to store distances
+            # Initialize dist matrix to store distances / point to cluster center
             dist = np.zeros((centersCM.shape[0], testingData.shape[1]))
 
             # Loop through each testing data point and each cluster center
