@@ -22,7 +22,7 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
         clusterNumber.append(clusterNumber[0] + j)  # Generating cluster numbers
 
         STR = {'c': clusterNumber[j+1]}  # Setting the current cluster number
-        FM, _ = fuzz.fmclust(DAT, STR)  # Fuzzy clustering
+        FM, *_ = fuzz.cluster.cmeans(DAT, STR)  # Fuzzy clustering
 
         # Computing similarity between testing data and clusters
         Ym, _, _, _, _ = fuzz.fmsim(testingData.T, testingClass.T, FM)
