@@ -2,7 +2,6 @@ import numpy as np
 from sklearn.metrics import confusion_matrix
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
-from operations import plot_loss_curve, plot_train_state_before_after, plot_confusion_matrix, plot_error_histogram
 from neuralNetwork import neuralNetwork
 from fuzzyModel import fuzzyModel
 from cmeansClustering import cmeansClustering
@@ -125,27 +124,6 @@ while True:
                 history, model, targetsNN, outputsNN, performanceNN, _, yTst, tTst, _, loss_curve = neuralNetwork(training_data, training_class)
                 # View neural network
                 # view(netNN)
-                                
-                # Assuming plotperform, plottrainstate, plotconfusion, ploterrhist are functions that handle plotting the respective metrics
-                plt.figure(1)
-                # Plotting performance metrics / fit
-                plot_loss_curve(history)
-                plt.title('Performance of ANN')
-
-                plt.figure(2)
-                # Plotting training states
-                plot_train_state_before_after(model)
-                plt.title('Training State of ANN')
-
-                plt.figure(3)
-                # Plotting confusion matrix
-                plot_confusion_matrix(tTst, yTst)
-                plt.title('Confusion Matrix of ANN')
-
-                plt.figure(4)
-                # Plotting error histogram
-                plot_error_histogram(loss_curve)
-                plt.title('Error Histogram of ANN')
 
                 plt.show()
 
