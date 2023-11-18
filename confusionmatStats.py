@@ -32,16 +32,18 @@ def confusionmatStats(group, grouphat=None):
         value1 = group
     else:
         value1 = np.array([[np.sum((group == i) & (grouphat == j)) for j in np.unique(grouphat)] for i in np.unique(group)])
-        
+
     numOfClasses = value1.shape[0]
     totalSamples = np.sum(value1)
     
     accuracy = (2 * np.trace(value1) + np.sum(2 * value1)) / (numOfClasses * totalSamples) - 1
 
     TP = np.diag(value1)
-    TN = [np.sum(np.delete(np.delete(value1, i, axis=0), i, axis=1)) for i in range(numOfClasses)]
     FP = np.sum(value1, axis=0) - TP
     FN = np.sum(value1, axis=1) - TP
+
+    # Ensure TN calculation doesn't encounter index out of bounds error
+    TN = [np.sum(value1) - np.sum(np.delete(np.delete(value1, i, axis=0), i, axis=1)) + TP[i] for i in range(numOfClasses)]
 
     sensitivity = TP / (TP + FN)
     specificity = np.array(TN) / (np.array(FP) + np.array(TN))
