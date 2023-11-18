@@ -7,6 +7,14 @@ import Preprocessing3
 
 Preprocessing3
 
+# Loading the saved variables
+saved_data = np.load('saved_data.npz')
+testingData = saved_data['testingData']
+testingClass = saved_data['testingClass']
+trainingData = saved_data['trainingData']
+# Repeat this for other variables
+
+
 def cmeansClustering(trainingData, testingData, testingClass):
     # Generating a range of values from 1.1 to 3.5 with steps of 0.1
     p_values = np.arange(1.1, 3.6, 0.1)

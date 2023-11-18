@@ -4,10 +4,17 @@ import matplotlib.pyplot as plt
 import cmeansClustering, kmeansClustering, fuzzyModel, neuralNetwork
 import Preprocessing, Preprocessing3
 
-Preprocessing3
-
 # folder = r"path_to_your_folder\FMID5\\"
 # Change the folder path 
+
+Preprocessing3
+
+# Loading the saved variables
+saved_data = np.load('saved_data.npz')
+testingData = saved_data['testingData']
+testingClass = saved_data['testingClass']
+trainingData = saved_data['trainingData']
+# Repeat this for other variables
 
 print('\nSmart Detector by Ricardo Chin\n')
 print('This program detects fake news automatically using metadata\n')
