@@ -28,3 +28,10 @@ testingClassLing = metaTargets[:, 0::4]
 # 75% of data for training
 trainingDataLing = np.delete(metaInputsLing, np.s_[::4], axis=1)
 trainingClassLing = np.delete(metaTargets, np.s_[::4], axis=1)
+
+# Saving the variables into a .npz file
+np.savez('saved_data.npz',
+         testingData=testingData, testingClass=testingClass,
+         trainingData=trainingData, trainingClass=trainingClass,
+         testingDataLing=testingDataLing, testingClassLing=testingClassLing,
+         trainingDataLing=trainingDataLing, trainingClassLing=trainingClassLing)

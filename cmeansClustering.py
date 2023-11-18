@@ -3,6 +3,9 @@ from sklearn.metrics import accuracy_score
 # pip install -U scikit-fuzzy
 from skfuzzy import cmeans
 from scipy.spatial import distance
+import Preprocessing3
+
+Preprocessing3
 
 def cmeansClustering(trainingData, testingData, testingClass):
     # Generating a range of values from 1.1 to 3.5 with steps of 0.1
@@ -60,4 +63,4 @@ def cmeansClustering(trainingData, testingData, testingClass):
 
 
 # Call the function
-#[cmeansTest, cmeansCluster, cmeansAcc, exponentValue] = cmeansClustering(trainingData, testingData, testingClass)
+[cmeansTest, cmeansCluster, cmeansAcc, exponentValue] = cmeansClustering(trainingData, testingData, testingClass)

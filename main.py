@@ -2,10 +2,12 @@ import numpy as np
 from scipy.io import loadmat
 import matplotlib.pyplot as plt
 import cmeansClustering, kmeansClustering, fuzzyModel, neuralNetwork
-from skfuzzy import fmclust
+import Preprocessing, Preprocessing3
 
-folder = r"path_to_your_folder\FMID5\\"
-# Change the folder path to where your data is located
+Preprocessing3
+
+# folder = r"path_to_your_folder\FMID5\\"
+# Change the folder path 
 
 print('\nSmart Detector by Ricardo Chin\n')
 print('This program detects fake news automatically using metadata\n')
