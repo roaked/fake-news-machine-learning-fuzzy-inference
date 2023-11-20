@@ -2,6 +2,23 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 import skfuzzy as fuzz
 from confusionmatStats import confusionmatStats  # You'll need to define or import this function
+import Preprocessing3 
+#from fuzzyModel import fuzzyModel
+
+Preprocessing3
+
+# Loading the saved variables
+saved_data = np.load('saved_data.npz')
+
+# Retrieve the variables from the loaded file
+testingData = saved_data['testingData']
+testingClass = saved_data['testingClass']
+trainingData = saved_data['trainingData']
+trainingClass = saved_data['trainingClass']
+testingDataLing = saved_data['testingDataLing']
+testingClassLing = saved_data['testingClassLing']
+trainingDataLing = saved_data['trainingDataLing']
+trainingClassLing = saved_data['trainingClassLing']
 
 def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
     Input = trainingData.T
@@ -71,3 +88,5 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
     YClassOptimal = [1 if y > MaxThreshold else 0 for y in Ym]
 
     return MaxAccuracy, Ym, YClassOptimal, YClass, FM, clusterNumber
+
+MaxA, Ym, YClassOptimal, YClass, FM, clusterNumber = fuzzyModel(trainingData, trainingClass, testingData, testingClass)
