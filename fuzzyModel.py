@@ -3,7 +3,6 @@ from sklearn.metrics import accuracy_score
 import skfuzzy as fuzz
 from confusionmatStats import confusionmatStats  # You'll need to define or import this function
 import Preprocessing3 
-#from fuzzyModel import fuzzyModel
 
 Preprocessing3
 
@@ -89,4 +88,4 @@ def fuzzyModel(trainingData, trainingClass, testingData, testingClass):
 
     return MaxAccuracy, Ym, YClassOptimal, YClass, FM, clusterNumber
 
-MaxA, Ym, YClassOptimal, YClass, FM, clusterNumber = fuzzyModel(trainingData, trainingClass, testingData, testingClass)
+#MaxA, Ym, YClassOptimal, YClass, FM, clusterNumber = fuzzyModel(trainingData, trainingClass, testingData, testingClass)
